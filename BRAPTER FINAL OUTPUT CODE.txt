@@ -1,0 +1,356 @@
+
+/*
+  SD card read/write
+
+ This example shows how to read and write data to and from an SD card file
+ The circuit:
+ * SD card attached to SPI bus as follows:
+ ** MOSI - pin 11
+ ** MISO - pin 12
+ ** CLK - pin 13
+ ** CS - pin 4
+
+ created   Nov 2010
+ by David A. Mellis
+ modified 9 Apr 2012
+ by Tom Igoe
+
+ This example code is in the public domain.
+
+ */
+
+#include <SPI.h>
+#include <SD.h>
+
+
+File myFile;
+char a[100];
+int i,j,n;
+float b;
+void MOVE(void);
+void NEXTCHAR(void);
+void NEXTROW(void);
+void NEXTLINE(void);
+void PUNCH(void);
+void forward(void);
+void backward(void); 
+void stopped(void);
+int dirpin1 = A5;//motor1 below plank 
+int stepin1 =A4;
+int dirpin2 = 6;//motor2 above plank
+int stepin2 =7;
+int rightforward = 2;
+int rightbackward = 3;
+int Enable = 5;
+int pwm = 150;/////////////////////
+int count=0;
+int number=0;
+void longmove(void);
+void setup() 
+{
+
+  pinMode(dirpin1,OUTPUT);
+  pinMode(dirpin2,OUTPUT);
+  pinMode(stepin1,OUTPUT);
+  pinMode(stepin2,OUTPUT);
+  pinMode(rightforward,OUTPUT);
+  pinMode(rightbackward,OUTPUT);
+  pinMode(Enable,OUTPUT);
+  
+  // put your setup code here, to run once:
+ analogWrite(Enable,pwm);
+  Serial.begin(9600);
+  while (!Serial) {
+    ;// wait for serial port to connect. Needed for native USB port only
+  }
+
+
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(4)) 
+  {
+    Serial.println("initialization failed!"); 
+    return;
+  }
+  Serial.println("initialization done.");
+
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+
+
+  // re-open the file for reading:
+  myFile = SD.open("win.txt");///////////////////////////////////file name
+  if (myFile) 
+  {
+    //Serial.println("yes.txt:");
+
+    // read from the file until there's nothing else in it:
+    i=0;
+    while (myFile.available())
+    {
+    a[i] = myFile.read();
+      Serial.write(a[i]);
+      i++;
+    }
+    // close the file:
+    myFile.close();
+  }
+  else
+  {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+
+  }
+  for(n=0;n<i;n=n+8)//30 char 
+  {
+    for(j=n;j<n+8;j++)
+    {
+      if(a[j]=='A'||a[j]=='B'||a[j]=='E'||a[j]=='H'||a[j]=='K'||a[j]=='L'||a[j]=='O'||a[j]=='R'||a[j]=='U'||a[j]=='V'||a[j]=='Z')
+      {
+        
+        PUNCH();
+         Serial.print("a 1");
+        MOVE();
+        NEXTCHAR();
+      }
+      if(a[j]=='C'||a[j]=='D'||a[j]=='F'||a[j]=='G'||a[j]=='M'||a[j]=='N'||a[j]=='P'||a[j]=='Q'||a[j]=='X'||a[j]=='Y')
+      {
+        PUNCH();
+         Serial.print("c 1");
+        MOVE();
+        PUNCH();
+         Serial.print("c 1");
+       NEXTCHAR();
+      }
+      if(a[j]=='I'||a[j]=='J'||a[j]=='S'||a[j]=='T'||a[j]=='W')
+      {  MOVE();
+        PUNCH();
+      Serial.print("i 1");
+        NEXTCHAR();
+      }
+      if(a[j]==' ')
+      {
+      MOVE();
+      NEXTCHAR();
+      }
+    }
+    NEXTROW();
+    for(j=n;j<n+8;j++)//row2
+    {
+      if(a[j]=='A'||a[j]=='C'||a[j]=='K'||a[j]=='M'||a[j]=='U'||a[j]=='X')
+    {
+      MOVE();
+      NEXTCHAR();
+    }
+    if(a[j]=='B'||a[j]=='F'||a[j]=='I'||a[j]=='L'||a[j]=='P'||a[j]=='S'||a[j]=='V')
+   { 
+    PUNCH();
+     Serial.print("b 2");
+    MOVE();
+    NEXTCHAR();
+   }
+    if(a[j]=='D'||a[j]=='E'||a[j]=='N'||a[j]=='O'||a[j]=='Y'||a[j]=='Z')
+  {
+  
+  MOVE();
+  PUNCH();
+   Serial.print("d 2");
+  NEXTCHAR();
+  }
+  if(a[j]=='G'||a[j]=='H'||a[j]=='J'||a[j]=='Q'||a[j]=='R'||a[j]=='T'||a[j]=='W')
+  {
+  PUNCH();
+   Serial.print("g 2");
+  MOVE();
+  PUNCH();
+   Serial.print("g 2");
+  NEXTCHAR();
+  }
+  if(a[j]==' ')
+  {
+  MOVE();
+  NEXTCHAR();
+  }
+}
+NEXTROW();
+  for(j=n;j<n+8;j++)//row3
+  {
+  if(a[j]=='A'||a[j]=='B'||a[j]=='C'||a[j]=='D'||a[j]=='E'||a[j]=='F'||a[j]=='G'||a[j]=='H'||a[j]=='I'||a[j]=='J')
+  {
+    MOVE();
+    NEXTCHAR();
+  }
+   if(a[j]=='K'||a[j]=='L'||a[j]=='M'||a[j]=='N'||a[j]=='O'||a[j]=='P'||a[j]=='Q'||a[j]=='R'||a[j]=='S'||a[j]=='T')
+  {
+   PUNCH();
+    Serial.print("k 3");
+   MOVE();
+   NEXTCHAR();
+  }
+  if(a[j]=='U'||a[j]=='V'||a[j]=='X'||a[j]=='Y'||a[j]=='Z')
+  {
+   PUNCH();
+    Serial.print("u 3");
+   MOVE();
+   PUNCH();
+    Serial.print("u 3");
+   NEXTCHAR();
+  }
+  if(a[j]=='W')
+  {
+  MOVE();
+  PUNCH();
+   Serial.print("w 3");
+  NEXTCHAR();
+  }
+  if(a[j]==' ')
+  {
+  MOVE();
+  NEXTCHAR();
+  }
+  }
+NEXTLINE();
+}//end n
+}
+ 
+void MOVE()
+{
+    for(b=0;b<(33*2);b++)//motor 2
+    {
+      digitalWrite(dirpin2,LOW);//////////////////////////high or low
+      digitalWrite(stepin2,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin2,HIGH);
+   
+    }
+    count++;
+    delay(200);
+}  
+void NEXTCHAR()
+{
+    for(b=0;b<(37*2);b++)//m2
+    {
+      digitalWrite(dirpin2,LOW);//////////////////
+      digitalWrite(stepin2,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin2,HIGH);
+    }number++;
+    delay(200);
+}  
+void NEXTROW()
+{
+  for(b=0;b<(80*3);b++)//motor1
+    {
+      digitalWrite(dirpin1,LOW);/////////////////////
+      digitalWrite(stepin1,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin1,HIGH);
+    }
+    longmove();
+   /*  for(b=0;b<((384*4.7)+22);b++)//m2
+    {
+      digitalWrite(dirpin2,LOW);//////////////////////////////////////
+      digitalWrite(stepin2,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin2,HIGH);
+    }*/
+}
+void NEXTLINE()
+{ for(b=0;b<333*3;b++)//m1
+    {
+      digitalWrite(dirpin1,LOW);//////////////////////////////
+      digitalWrite(stepin1,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin1,HIGH);
+    } 
+    longmove();
+   /* for(b=0;b<((384*4.7)+22);b++)//m2
+    {
+      digitalWrite(dirpin2,LOW);///////////////////////////
+      digitalWrite(stepin2,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin2,HIGH);
+    }*/
+}
+
+void longmove()
+{ for(b=0;b<(((33*2*count)+(37*2*number))-30);b++)//motor 2
+    {
+      digitalWrite(dirpin2,HIGH);//////////////////////////high or low
+      digitalWrite(stepin2,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin2,HIGH);
+   
+    }
+    count=0;
+    number=0;
+  
+}
+//delay(500);
+
+  
+  // put your setup code here, to run once:
+
+
+void forward()
+{
+  
+  digitalWrite( rightforward, LOW );
+  
+  digitalWrite( rightbackward, HIGH );
+  
+  
+}
+void backward()
+{
+  digitalWrite( rightforward, HIGH);
+  
+  digitalWrite( rightbackward, LOW);
+  
+  
+}
+void stopped()
+{
+  digitalWrite(rightforward,LOW);
+  digitalWrite(rightbackward,LOW);
+}
+void PUNCH()
+{
+  analogWrite(Enable,pwm);
+
+  forward();
+  delay(400); 
+  backward();
+  delay(400);
+ 
+  stopped();
+  delay(200);
+}
+
+void loop()
+{
+  /*punch();
+  for(b=0;b<((384*4)-37);b++)//m2
+    {
+      digitalWrite(dirpin2,HIGH);//////////////////////////////////////
+      digitalWrite(stepin2,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin2,HIGH);
+    }
+    punch();
+for(b=0;b<((384*4)-37);b++)//m2
+    {
+      digitalWrite(dirpin2,LOW);//////////////////////////////////////
+      digitalWrite(stepin2,LOW);
+      delayMicroseconds(500);
+      digitalWrite(stepin2,HIGH);
+    }
+//MOVE();
+//delay(100);
+punch();*/
+}
+
+
+
+
+ 

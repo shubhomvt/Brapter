@@ -1,0 +1,156 @@
+#include<SD.h>
+#include<SPI.h>
+#include <Keypad.h>
+File myFile;
+void keypress(int, int);
+const byte ROWS = 4; //four rows
+const byte COLS = 4; //four columns
+//define the cymbols on the buttons of the keypads
+char hexaKeys[ROWS][COLS] = {
+{'1','2','3','A'},
+{'4','5','6','B'},
+{'7','8','9','C'},
+{'*','0','#','D'}
+};
+byte rowPins[ROWS]={6,7,8,9};
+byte colPins[COLS]={A0,A1,A2,A3};
+//initialize an instance of class NewKeypad
+Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+int i,j,a;
+int x[10];
+int y[10];
+void setup()
+{
+Serial.begin(9600);
+if (!SD.begin(4))
+{
+Serial.println("initialization failed");
+return;
+}
+else
+{
+Serial.println("initialization complete");
+}
+}
+void loop()
+{ char ch;
+char customKey='-' ;
+for(i=0;i<8;i++)
+{
+x[i]=0;
+y[i]=0;
+}
+for(;customKey!='#';) {
+customKey = customKeypad.getKey();
+if (customKey){
+if (customKey =='2'){
+Serial.print("pressed 2");
+x[4]=1;}
+else
+x[4]=0;
+if (customKey =='3'){
+Serial.print("pressed 3");
+x[0]=1;}
+else
+x[0]=0;
+if(customKey=='5'){
+Serial.print("pressed 5");
+x[5]=1;}
+else
+x[5]=0;
+if(customKey== '6'){
+Serial.print("pressed 6");
+x[1]=1;}
+else
+x[1]=0;
+if(customKey== '8'){
+Serial.print("pressed 8");
+x[6]=1;}
+else
+x[6]=0;
+if(customKey== '9'){
+Serial.print("pressed 9");
+x[2]=1;}
+else
+x[2]=0;
+if(customKey== '0'){
+Serial.print("pressed 0");
+x[7]=1;}
+else
+x[7]=0;
+if(customKey== '#'){
+Serial.print("pressed #");
+x[3]=1;}
+else
+x[3]=0;
+for(a=0;a<8;a++)
+{
+y[a]=y[a]+ x[a];}
+}
+}
+Serial.print("came out");
+if ( y[0]==0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]==0 && y[7]==0 ){
+Serial.print("pressed a");
+ch = 'A';}
+else if ( y[0]==0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]==0 && y[7]==0 )
+ch = 'B';
+else if ( y[0]>0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]==0 && y[7]==0 )
+ch = 'C';
+else if ( y[0]>0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]==0 && y[7]==0 )
+ch = 'D';
+else if ( y[0]==0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]==0 && y[7]==0 )
+ch = 'E';
+else if ( y[0]>0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]==0 && y[7]==0 )
+ch = 'F';
+else if ( y[0]>0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]==0 && y[7]==0 )
+ch = 'G';
+else if ( y[0]==0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]==0 && y[7]==0 )
+ch = 'H';
+else if ( y[0]>0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]==0 && y[5]>0 && y[6]==0 && y[7]==0 )
+ch = 'I';
+else if ( y[0]>0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]==0 && y[5]>0 && y[6]==0 && y[7]==0 )
+ch = 'J';
+else if ( y[0]==0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'K';
+else if ( y[0]==0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]>0 && y[7]==0 )
+ch = 'L';
+else if ( y[0]>0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'M';
+else if ( y[0]>0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'N';
+else if ( y[0]==0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'O';
+else if ( y[0]>0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]>0 && y[7]==0 )
+ch = 'P';
+else if ( y[0]>0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]>0 && y[7]==0 )
+ch = 'Q';
+else if ( y[0]==0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]>0 && y[7]==0 )
+ch = 'R';
+else if ( y[0]>0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]==0 && y[5]>0 && y[6]>0 && y[7]==0 )
+ch = 'S';
+else if ( y[0]>0 && y[1]>0 && y[2]==0 && y[3]>0 && y[4]==0 && y[5]>0 && y[6]>0 && y[7]==0 )
+ch = 'T';
+else if ( y[0]==0 && y[1]==0 && y[2]>0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'U';
+else if ( y[0]==0 && y[1]==0 && y[2]>0 && y[3]>0 && y[4]>0 && y[5]>0 && y[6]>0 && y[7]==0 )
+ch = 'V';
+else if ( y[0]>0 && y[1]>0 && y[2]>0 && y[3]>0 && y[4]==0 && y[5]>0 && y[6]==0 && y[7]==0 )
+ch = 'W';
+else if ( y[0]>0 && y[1]==0 && y[2]>0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'X';
+else if ( y[0]>0 && y[1]>0 && y[2]>0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'Y';
+else if ( y[0]==0 && y[1]>0 && y[2]>0 && y[3]>0 && y[4]>0 && y[5]==0 && y[6]>0 && y[7]==0 )
+ch = 'Z';
+else if ( y[0]==0 && y[1]==0 && y[2]==0 && y[3]>0 && y[4]==0 && y[5]==0 && y[6]==0 && y[7]==0 )
+ch = ' ';
+myFile =SD.open("yes.txt",FILE_WRITE);
+if(myFile)
+{
+Serial.print(ch);
+myFile.print(ch);
+myFile.close();
+}
+else
+Serial.println("error..");
+}
